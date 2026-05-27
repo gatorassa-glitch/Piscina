@@ -1,54 +1,49 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Preloader
-    const preloader = document.getElementById('preloader');
-    setTimeout(() => {
-        preloader.style.opacity = '0';
-        setTimeout(() => {
-            preloader.style.display = 'none';
-        }, 500);
-    }, 1500);
+(() => {
+    const $ = (s, p = document) => p.querySelector(s);
+    const $$ = (s, p = document) => p.querySelectorAll(s);
 
-    // 2. Navbar Scroll Effect & Active Links
-    const navbar = document.getElementById('navbar');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const sections = document.querySelectorAll('section');
+    // Navbar scroll & active section tracking
+    const navbar = $('#navbar');
+    const navLinks = $$('.nav-link');
+    const sections = $$('section[id]');
+    let ticking = false;
 
-    window.addEventListener('scroll', () => {
-        // Navbar background
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
+    const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
 
-        // Active links based on scroll position
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (scrollY >= (sectionTop - 200)) {
-                current = section.getAttribute('id');
-            }
+            // Navbar style
+            navbar.classList.toggle('scrolled', scrollY > 50);
+
+            // Back to top visibility
+            $('#backToTop').classList.toggle('visible', scrollY > 500);
+
+            // Active nav link
+            let current = '';
+            sections.forEach(sec => {
+                if (scrollY >= sec.offsetTop - 200) current = sec.id;
+            });
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+            });
+
+            ticking = false;
         });
+    };
 
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href').includes(current)) {
-                link.classList.add('active');
-            }
-        });
-    });
+    window.addEventListener('scroll', onScroll, { passive: true });
 
-    // 3. Mobile Menu Toggle
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('navMenu');
+    // Mobile menu
+    const hamburger = $('#hamburger');
+    const navMenu = $('#navMenu');
 
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         navMenu.classList.toggle('active');
     });
 
-    // Close mobile menu when clicking a link
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
             hamburger.classList.remove('active');
@@ -56,85 +51,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. Counter Animation for Stats
-    const counters = document.querySelectorAll('.stat-number');
-    const speed = 200; // The lower the slower
-
-    const animateCounters = () => {
-        counters.forEach(counter => {
-            const target = +counter.getAttribute('data-target');
-            const count = +counter.innerText;
-            const increment = target / speed;
-
-            if (count < target) {
-                counter.innerText = Math.ceil(count + increment);
-                setTimeout(animateCounters, 20);
-            } else {
-                counter.innerText = target;
-            }
-        });
-    }
-
-    // Intersection Observer to trigger counter animation
-    const statsSection = document.querySelector('.hero-stats');
-    if (statsSection) {
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                animateCounters();
-                observer.disconnect();
-            }
-        }, { threshold: 0.5 });
-        
-        observer.observe(statsSection);
-    }
-
-    // 5. Back to Top Button
-    const backToTopBtn = document.getElementById('backToTop');
-    
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 500) {
-            backToTopBtn.classList.add('visible');
-        } else {
-            backToTopBtn.classList.remove('visible');
-        }
-    });
-
-    backToTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-
-    // 6. Smooth Scrolling for Anchor Links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+    // Smooth scroll for anchor links
+    $$('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', e => {
+            const id = anchor.getAttribute('href');
+            if (id === '#') return;
+            const target = $(id);
+            if (!target) return;
             e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                const headerOffset = 80;
-                const elementPosition = targetElement.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-  
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
+            window.scrollTo({
+                top: target.offsetTop - 80,
+                behavior: 'smooth'
+            });
         });
     });
 
-    // 7. Form Submission Handling (Optional enhancement)
-    const quoteForm = document.getElementById('quoteForm');
-    const formSuccess = document.getElementById('formSuccess');
-    
-    if (quoteForm) {
-        // We use FormSubmit.co, so we let it handle the actual submission,
-        // but we could intercept it here if we wanted to use AJAX instead.
-        // For now, we'll let it submit normally to the form handler.
+    // Back to top
+    $('#backToTop').addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Counter animation (runs once when visible)
+    const statsEl = $('.hero-stats');
+    if (statsEl) {
+        const counters = $$('.stat-number');
+        let animated = false;
+
+        const animate = () => {
+            if (animated) return;
+            animated = true;
+            counters.forEach(el => {
+                const target = +el.dataset.target;
+                const duration = 1500;
+                const start = performance.now();
+
+                const step = now => {
+                    const progress = Math.min((now - start) / duration, 1);
+                    el.textContent = Math.ceil(progress * target);
+                    if (progress < 1) requestAnimationFrame(step);
+                };
+
+                requestAnimationFrame(step);
+            });
+        };
+
+        new IntersectionObserver(([entry], obs) => {
+            if (entry.isIntersecting) { animate(); obs.disconnect(); }
+        }, { threshold: 0.5 }).observe(statsEl);
     }
-});
+})();
