@@ -20,7 +20,7 @@
 
 /* === Reset === */
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
+html { scroll-behavior:smooth; overflow-x:hidden; }
 body { font-family:var(--font-main); color:var(--text); line-height:1.6; overflow-x:hidden; background:var(--white); }
 a { text-decoration:none; color:inherit; transition:var(--ease); }
 ul { list-style:none; }
@@ -214,8 +214,25 @@ img { max-width:100%; height:auto; display:block; }
     .footer-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:768px){
-    .nav-menu{position:fixed;top:0;right:-100%;width:80%;height:100vh;background:var(--primary);flex-direction:column;justify-content:center;align-items:center;transition:right .4s cubic-bezier(.77,0,.175,1);z-index:1000;box-shadow:-5px 0 15px rgba(0,0,0,.1)}
-    .nav-menu.active{right:0}
+    /* Evita desbordamiento horizontal usando TranslateX en vez de right: -100% */
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 80%;
+        height: 100vh;
+        background: var(--primary);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transform: translateX(100%);
+        transition: transform .4s cubic-bezier(.77,0,.175,1);
+        z-index: 1000;
+        box-shadow: -5px 0 15px rgba(0,0,0,.1);
+    }
+    .nav-menu.active {
+        transform: translateX(0);
+    }
     .nav-link{font-size:1.2rem;margin:10px 0}
     .navbar.scrolled .nav-link{color:var(--white)}
     .hamburger{display:flex}
@@ -260,6 +277,19 @@ img { max-width:100%; height:auto; display:block; }
         width: 100%;
         height: 1px;
     }
+    
+    /* Evita que los items del feature de Sobre Nosotros se rompan en pantallas angostas */
+    .about-features {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* Evita el desbordamiento de las tarjetas en celulares (minmax de 350px rompía el layout de 320px/375px) */
+    .works-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
     .form-row {
         flex-direction: column;
         gap: 20px;
