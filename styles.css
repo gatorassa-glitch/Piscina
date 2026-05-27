@@ -20,8 +20,31 @@
 
 /* === Reset === */
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; overflow-x:hidden; }
+html { 
+    scroll-behavior:smooth; 
+    overflow-x:hidden; 
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary) #f1f7fd;
+}
 body { font-family:var(--font-main); color:var(--text); line-height:1.6; overflow-x:hidden; background:var(--white); }
+
+/* Custom Scrollbar (WebKit) */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f7fd;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary), var(--secondary));
+    border-radius: 5px;
+    border: 2px solid #f1f7fd;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--secondary), var(--accent));
+}
+
 a { text-decoration:none; color:inherit; transition:var(--ease); }
 ul { list-style:none; }
 img { max-width:100%; height:auto; display:block; }
