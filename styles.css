@@ -267,13 +267,13 @@ img { max-width:100%; height:auto; display:block; }
 
     /* Mostrar info de trabajos uno a uno al hacer scroll en celular */
     .work-overlay {
-        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .work-info {
-        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .work-image {
-        transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .work-card.active .work-overlay {
         opacity: 1;

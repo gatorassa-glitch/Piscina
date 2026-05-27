@@ -103,18 +103,19 @@
     // Reveal work cards on scroll for mobile devices
     const workCards = $$('.work-card');
     if (workCards.length > 0) {
-        const revealCard = (entries, observer) => {
+        const revealCard = (entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
+                } else {
+                    entry.target.classList.remove('active');
                 }
             });
         };
 
         const cardObserver = new IntersectionObserver(revealCard, {
-            threshold: 0.15,
-            rootMargin: '0px 0px -80px 0px'
+            rootMargin: '-30% 0px -30% 0px', // Activo solo cuando la tarjeta está en el centro de la pantalla
+            threshold: 0
         });
 
         workCards.forEach(card => cardObserver.observe(card));
