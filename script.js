@@ -97,6 +97,6 @@
 
         new IntersectionObserver(([entry], obs) => {
             if (entry.isIntersecting) { animate(); obs.disconnect(); }
-        }, { threshold: 0.5 }).observe(statsEl);
+        }, { threshold: 0.15 }).observe(statsEl);
     }
 })();
