@@ -99,4 +99,24 @@
             if (entry.isIntersecting) { animate(); obs.disconnect(); }
         }, { threshold: 0.15 }).observe(statsEl);
     }
+
+    // Reveal work cards on scroll for mobile devices
+    const workCards = $$('.work-card');
+    if (workCards.length > 0) {
+        const revealCard = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        };
+
+        const cardObserver = new IntersectionObserver(revealCard, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -80px 0px'
+        });
+
+        workCards.forEach(card => cardObserver.observe(card));
+    }
 })();
